@@ -6,10 +6,13 @@ import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import org.apache.commons.io.FileUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,16 +28,14 @@ public class HtmlVisualizer {
     }
 
     public void printRankings(Tournament tournament, String runDirectory) throws IOException, TemplateException {
-        String resultsDirectory = String.format("%s/results", runDirectory);
+        String resultsDirectoryPath = String.format("%s/results", runDirectory);
+        createOrPurgeResultsDirectory(new File(resultsDirectoryPath));
 
-        if (!new File(resultsDirectory).exists()) {
-            new File(resultsDirectory).mkdir();
-        }
-        buildSummaryHtml(tournament, resultsDirectory);
-        buildGamesHtml(tournament.getGames(), resultsDirectory);
+        buildSummaryHtml(tournament, resultsDirectoryPath);
+        buildGamesHtml(tournament.getGames(), resultsDirectoryPath);
     }
 
-    private void buildGamesHtml(List<Game> games, String resultsDirectory) throws IOException, TemplateException {
+    private void buildGamesHtml(List<Game> games, String resultsDirectoryPath) throws IOException, TemplateException {
         Template gameTemplate = config.getTemplate("game.ftl");
         for (Game game : games) {
             Map<String, Object> root = new HashMap<String, Object>();
@@ -43,7 +44,7 @@ public class HtmlVisualizer {
             root.put("firstPlayerTotalScore", game.totalScore(game.getFirstPlayerBoard()));
             root.put("secondPlayerScore", Game.calculateScore(game.getSecondPlayerBoard()));
             root.put("secondPlayerTotalScore", game.totalScore(game.getSecondPlayerBoard()));
-            Writer out = new PrintWriter(String.format("%s/game%s.html", resultsDirectory, game.getGameNumber()));
+            Writer out = new PrintWriter(String.format("%s/game%s.html", resultsDirectoryPath, game.getGameNumber()));
             gameTemplate.process(root, out);
             out.flush();
         }
@@ -58,5 +59,12 @@ public class HtmlVisualizer {
         Writer out = new PrintWriter(String.format("%s/summary.html", resultsDirectory));
         summaryTemplate.process(root, out);
         out.flush();
+    }
+
+    private void createOrPurgeResultsDirectory(File resultsDirectory) throws IOException {
+        if (resultsDirectory.exists()) {
+            FileUtils.deleteDirectory(resultsDirectory);
+        }
+        resultsDirectory.mkdir();
     }
 }

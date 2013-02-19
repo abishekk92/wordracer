@@ -1,17 +1,14 @@
 package com.codingnirvana.wordracer;
 
-import com.codingnirvana.wordracer.gamerunner.Game;
 import com.codingnirvana.wordracer.gamerunner.Player;
 import com.codingnirvana.wordracer.gamerunner.Tournament;
 import com.codingnirvana.wordracer.visualizer.ConsoleVisualizer;
 import com.codingnirvana.wordracer.visualizer.HtmlVisualizer;
-import freemarker.template.TemplateException;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileReader;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
 
 public class Runner {
     public static void main(String[] args) throws Exception {
@@ -40,4 +37,6 @@ public class Runner {
 
         new HtmlVisualizer().printRankings(tournament, runDirectory);
     }
+
+
 }

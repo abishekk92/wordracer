@@ -1,7 +1,12 @@
 package com.codingnirvana.wordracer.gamerunner;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public class Player {
 
@@ -27,6 +32,10 @@ public class Player {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getPlayerDirectory() {
+       return String.format("%s/%s/", runDirectory, this.directory);
     }
 
     public void initGameBoard(char letter, boolean isFirstPlayer) throws IOException {
@@ -63,7 +72,8 @@ public class Player {
     private void initializeProcess() throws IOException {
         List<String> res = Collections.synchronizedList(new ArrayList<String>());
         ProcessBuilder pb = new ProcessBuilder(this.command.split(" "));
-        pb.directory(new File(String.format("%s/%s/",runDirectory, this.directory)));
+        pb.directory(new File(getPlayerDirectory()));
+        IOUtils.copy(Player.class.getResourceAsStream("/words.dat"), new FileOutputStream(getPlayerDirectory() + "/words.dat"));
         process = pb.start();
         writer = new PrintWriter(process.getOutputStream());
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
